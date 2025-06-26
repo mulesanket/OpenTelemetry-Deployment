@@ -50,4 +50,4 @@ jobs:
 
       - name: Verify deployment rollout
         run: |
-          kubectl rollout status deployment/product-catalog -n <opentelemetry-workspace>
+          kubectl rollout status deployment/product-catalog -n opentelemetry-workspace
