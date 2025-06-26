@@ -9,7 +9,8 @@ on:
 
 jobs:
   docker:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+
 
     steps:
       - name: Checkout code
@@ -35,7 +36,8 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/product-catalog:latest
 
   update-manifest:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+
     needs: docker
 
     steps:
