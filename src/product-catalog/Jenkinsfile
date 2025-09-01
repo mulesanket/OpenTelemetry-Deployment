@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    
+
         stages {
             stage ('Code Checkout') {
                 steps {
@@ -9,13 +9,13 @@ pipeline {
                 }
             }
 
-            stage ('') {
+            stage ('Test') {
                 steps {
                     echo 'test'
                 }
             }
 
-            stage ('') {
+            stage ('Test Test') {
                 steps {
                     echo 'test test'
                 }
