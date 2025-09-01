@@ -6,6 +6,7 @@ pipeline {
                 steps {
                      // Clean workspace to avoid leftover files
                      cleanWs()
+                     checkout scm
                 }
             }
 
