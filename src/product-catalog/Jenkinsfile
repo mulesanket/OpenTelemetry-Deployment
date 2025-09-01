@@ -1,0 +1,26 @@
+pipeline {
+    agent any
+
+    {
+        stages {
+            stage ('Code Checkout') {
+                steps {
+                     // Clean workspace to avoid leftover files
+                     cleanWs()
+                }
+            }
+
+            stage ('') {
+                steps {
+                    
+                }
+            }
+
+            stage ('') {
+                steps {
+                    
+                }
+            }
+        }
+    }
+}
