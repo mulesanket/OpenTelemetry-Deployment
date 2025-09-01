@@ -12,13 +12,13 @@ pipeline {
 
             stage ('') {
                 steps {
-                    
+                    echo 'test'
                 }
             }
 
             stage ('') {
                 steps {
-                    
+                    echo 'test test'
                 }
             }
         }
