@@ -7,10 +7,15 @@ pipeline {
                      // Clean workspace to avoid leftover files
                      cleanWs()
                      checkout scm
+                     sh '''
+                     echo "Commit SHA: $(git rev-parse HEAD)"
+                     echo "Branch: $(git rev-parse --abbrev-ref HEAD)"
+                     echo "Build number: ${BUILD_NUMBER}"
+                  '''
                 }
             }
 
-            stage ('Test') {
+            stage ('Build') {
                 steps {
                     echo 'test'
                 }
