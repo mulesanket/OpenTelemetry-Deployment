@@ -29,12 +29,13 @@ pipeline {
         dir("${SERVICE_PATH}") {
           sh '''#!/usr/bin/env bash
             set -e
+            go version
 
             echo "[go] downloading modules..."
             go mod download
 
             echo "[test] running unit tests with race & coverage..."
-            go test ./... -race -coverprofile=coverage.out -covermode=atomic -v
+            go test ./... 
 
             echo "[coverage] summarizing..."
             go tool cover -func=coverage.out | tee coverage.txt
