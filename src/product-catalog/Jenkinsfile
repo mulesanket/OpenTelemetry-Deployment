@@ -1,6 +1,12 @@
 pipeline {
     agent any
 
+    environment {
+    SERVICE_PATH = 'src/product-catalog' 
+    COVERAGE_MIN = '20'                  
+    }
+
+
         stages {
             stage ('Code Checkout') {
                 steps {
@@ -14,10 +20,33 @@ pipeline {
                   '''
                 }
             }
-
-            stage ('Build') {
+5
+            stage ('Unit Tests') {
                 steps {
-                    echo 'test'
+                    dir ($"{SERVICE_PATH}") {
+                    sh '''    
+                    #!/usr/bin/env bash
+                    set -e
+
+                    echo "[go] downloading modules…"
+                    go mod download
+
+                    echo "[test] running unit tests with race & coverage…"
+                    go test ./... -race -coverprofile=coverage.out -covermode=atomic -v
+
+                    echo "[coverage] summarizing…"
+                    go tool cover -func=coverage.out | tee coverage.txt
+                
+                  TOTAL=$(awk '/^total:/ {print substr($3,1,length($3)-1)}' coverage.txt)
+                  TOTAL_INT=${TOTAL%.*}
+                  echo "Total coverage: ${TOTAL}%"
+                  if [ "$TOTAL_INT" -lt "${COVERAGE_MIN}" ]; then
+                  echo "❌ Coverage ${TOTAL}% is below required ${COVERAGE_MIN}%"
+                  exit 1
+                  fi
+                  echo "✅ Coverage gate passed"
+                ''' 
+                    }
                 }
             }
 
@@ -27,4 +56,11 @@ pipeline {
                 }
             }
         }
+
+        post {
+              always {
+            // Ensure workspace is cleaned after the stage
+              cleanWs()
+        }
+    }
 }
