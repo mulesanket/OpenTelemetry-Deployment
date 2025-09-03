@@ -1,6 +1,11 @@
 pipeline {
   agent any
 
+    tools { 
+    go 'Go-1.22'     // <-- the name you configured in Jenkins
+ }
+
+
   environment {
     SERVICE_PATH = 'src/product-catalog'
     COVERAGE_MIN = '20'
