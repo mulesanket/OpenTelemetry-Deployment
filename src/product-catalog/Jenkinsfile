@@ -62,6 +62,15 @@ pipeline {
       }
     }
 
+    stage('Secrets Scan') {
+    steps {
+        sh '''#!/usr/bin/env bash
+          set -e
+          gitleaks detect --no-banner --exit-code 1
+        '''
+      }
+    }
+
     stage('Test Test') {
       steps {
         echo 'test test'
