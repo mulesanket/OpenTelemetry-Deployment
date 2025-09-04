@@ -1,48 +1,43 @@
 pipeline {
-    agent {
+  agent any
 
-      docker {
-      image 'eclipse-temurin:21-jdk'
-      args "-v ${env.HOME}/.gradle:/root/.gradle:rw"
-      reuseNode true
-        }
+  options {
+    timestamps()
+    buildDiscarder(logRotator(numToKeepStr: '3'))
+  }
+
+  stages {
+    stage('Source Code Checkout') {
+      steps {
+        cleanWs()
+        checkout scm
+        sh '''
+          echo "Commit SHA: $(git rev-parse HEAD)"
+          echo "Branch: $(git rev-parse --abbrev-ref HEAD)"
+          echo "Build number: ${BUILD_NUMBER}"
+        '''
+        sh 'test -f gradlew || { echo "gradlew missing"; exit 1; }'
+        stash name: 'source', includes: '**/*', excludes: '.git/**'
+      }
     }
 
-     options {
-        timestamps()
-        buildDiscarder(logRotator(numToKeepStr: '3'))
+    stage('Dependency Restore') {
+      steps {
+        script {
+          docker.image('eclipse-temurin:21-jdk').inside("-v ${env.HOME}/.gradle:/root/.gradle:rw") {
+            unstash 'source'
+            sh 'chmod +x gradlew'
+            sh './gradlew downloadRepos --no-daemon'
+            stash name: 'deps-ready', includes: '**/*', excludes: '.git/**'
+          }
+        }
+      }
     }
 
-    stages {
-        stage ('Source Code Checkout') {
-            steps {
-                cleanWs()
-                checkout scm
-                  sh '''
-                    echo "Commit SHA: $(git rev-parse HEAD)"
-                    echo "Branch: $(git rev-parse --abbrev-ref HEAD)"
-                    echo "Build number: ${BUILD_NUMBER}"
-                    '''
-
-                    sh 'test -f gradlew || { echo "gradlew missing"; exit 1; }'
-                    stash name: 'source', includes: '**/*', excludes: '.git/**'
-            }
-        }
-
-        stage ('Dependency Restore') {
-            steps {
-                unstash 'source'
-                sh 'chmod +x gradlew'
-                sh './gradlew downloadRepos'
-                stash name: 'deps-ready', includes: '**/*', excludes: '.git/**'
-            }
-        }
-
-        stage ('test test') {
-            steps {
-                echo 'test test test'
-            }
-        }
-
+    stage('test test') {
+      steps {
+        echo 'test test test'
+      }
     }
+  }
 }
