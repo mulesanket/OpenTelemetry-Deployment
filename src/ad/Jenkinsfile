@@ -2,10 +2,6 @@ pipeline {
     agent any
 
     stages {
-        stage ('Code ') {
-
-        }
-
         stage ('Source Code Checkout') {
             steps {
                 cleanWs()
@@ -16,17 +12,19 @@ pipeline {
                      echo "Build number: ${BUILD_NUMBER}"
                      '''
             }
-
         }
 
-        stage ('') {
-
+        stage ('test') {
+            steps {
+                echo 'test test'
+            }
         }
 
-        stage ('') {
-
+        stage ('test test') {
+            steps {
+                echo 'test test test'
+            }
         }
-
 
     }
 }
