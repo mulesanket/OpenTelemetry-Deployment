@@ -1,5 +1,17 @@
 pipeline {
-    agent any
+    agent {
+
+      docker {
+      image 'eclipse-temurin:21-jdk'
+      args "-v ${env.HOME}/.gradle:/root/.gradle:rw"
+      reuseNode true
+        }
+    }
+
+     options {
+        timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '3'))
+    }
 
     stages {
         stage ('Source Code Checkout') {
@@ -7,16 +19,22 @@ pipeline {
                 cleanWs()
                 checkout scm
                   sh '''
-                     echo "Commit SHA: $(git rev-parse HEAD)"
-                     echo "Branch: $(git rev-parse --abbrev-ref HEAD)"
-                     echo "Build number: ${BUILD_NUMBER}"
-                     '''
+                    echo "Commit SHA: $(git rev-parse HEAD)"
+                    echo "Branch: $(git rev-parse --abbrev-ref HEAD)"
+                    echo "Build number: ${BUILD_NUMBER}"
+                    '''
+
+                    sh 'test -f gradlew || { echo "gradlew missing"; exit 1; }'
+                    stash name: 'source', includes: '**/*', excludes: '.git/**'
             }
         }
 
-        stage ('test') {
+        stage ('Dependency Restore') {
             steps {
-                echo 'test test'
+                unstash 'source'
+                sh 'chmod +x gradlew'
+                sh './gradlew downloadRepos'
+                stash name: 'deps-ready', includes: '**/*', excludes: '.git/**'
             }
         }
 

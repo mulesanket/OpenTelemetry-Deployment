@@ -20,6 +20,7 @@ pipeline {
           echo "Commit SHA: $(git rev-parse HEAD)"
           echo "Branch:     $(git rev-parse --abbrev-ref HEAD)"
           echo "Build #:    ${BUILD_NUMBER}"
+          echo "Workspace: ${WORKSPACE}"
         '''
       }
     }
