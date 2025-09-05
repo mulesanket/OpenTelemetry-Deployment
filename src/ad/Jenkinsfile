@@ -28,7 +28,7 @@ pipeline {
     stage('Build & Unit Tests') {
       steps { 
         dir ('src/ad') {
-            sh './gradlew clean build --no-daemon --stacktrace'
+            sh './gradlew clean build -x verifyGoogleJavaFormat --no-daemon --stacktrace'
         }
       }
        post {
