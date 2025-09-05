@@ -17,24 +17,43 @@ pipeline {
 
     stage('Dependency Restore') {
       steps {
-        dir ('src/ad') {
-            sh 'chmod +x gradlew'
-            sh './gradlew --version --no-daemon'
-            sh './gradlew downloadRepos --no-daemon'
+        dir('src/ad') {
+          sh 'chmod +x gradlew'
+          sh './gradlew --version --no-daemon'
+          sh './gradlew downloadRepos --no-daemon'
         }
       }
     }
 
     stage('Build & Unit Tests') {
-      steps { 
-        dir ('src/ad') {
-            sh './gradlew clean build -x verifyGoogleJavaFormat --no-daemon --stacktrace'
+      steps {
+        dir('src/ad') {
+          sh './gradlew clean build -x verifyGoogleJavaFormat --no-daemon --stacktrace'
         }
       }
-       post {
+      post {
         always {
           junit allowEmptyResults: true, testResults: 'src/ad/build/test-results/test/*.xml'
           archiveArtifacts allowEmptyArchive: true, artifacts: 'src/ad/build/libs/*.jar', fingerprint: true
+        }
+      }
+    }
+
+    stage('SonarQube Analysis') {
+      steps {
+        dir('src/ad') {
+          // Uses the SonarQube server named 'sonar' from Manage Jenkins > System
+          withSonarQubeEnv('sonar') {
+            sh './gradlew sonarqube --no-daemon'
+          }
+        }
+      }
+    }
+
+    stage('Quality Gate') {
+      steps {
+        timeout(time: 5, unit: 'MINUTES') {
+          waitForQualityGate abortPipeline: true
         }
       }
     }
