@@ -44,7 +44,7 @@ pipeline {
         dir('src/ad') {
           // Uses the SonarQube server named 'sonar' from Manage Jenkins > System
           withSonarQubeEnv('sonar') {
-            sh './gradlew sonarqube --no-daemon'
+            sh './gradlew sonar --no-daemon'
           }
         }
       }
