@@ -17,10 +17,24 @@ pipeline {
 
     stage('Dependency Restore') {
       steps {
-        dir('src/ad') {
-          sh 'chmod +x gradlew'
-          sh './gradlew --version --no-daemon'
-          sh './gradlew downloadRepos --no-daemon'
+        dir ('src/ad') {
+            sh 'chmod +x gradlew'
+            sh './gradlew --version --no-daemon'
+            sh './gradlew downloadRepos --no-daemon'
+        }
+      }
+    }
+
+    stage('Build & Unit Tests') {
+      steps { 
+        dir ('src/ad') {
+            sh './gradlew clean build --no-daemon --stacktrace'
+        }
+      }
+       post {
+        always {
+          junit allowEmptyResults: true, testResults: 'src/ad/build/test-results/test/*.xml'
+          archiveArtifacts allowEmptyArchive: true, artifacts: 'src/ad/build/libs/*.jar', fingerprint: true
         }
       }
     }
