@@ -1,23 +1,12 @@
 pipeline {
-  agent {
-    docker {
-      image 'eclipse-temurin:21-jdk'
-      args "-v ${env.HOME}/.gradle:/root/.gradle:rw"
-      reuseNode true
-    }
-  }
-
-  options {
-    timestamps()
-    buildDiscarder(logRotator(numToKeepStr: '3'))
-  }
+  agent any
+  options { timestamps(); buildDiscarder(logRotator(numToKeepStr: '3')) }
 
   stages {
     stage('Source Code Checkout') {
       steps {
         cleanWs()
         checkout scm
-
         sh '''
           echo "Commit SHA: $(git rev-parse HEAD)"
           echo "Branch    : $(git rev-parse --abbrev-ref HEAD)"
@@ -28,7 +17,7 @@ pipeline {
 
     stage('Dependency Restore') {
       steps {
-        dir('src/ad') {                
+        dir('src/ad') {
           sh 'chmod +x gradlew'
           sh './gradlew --version --no-daemon'
           sh './gradlew downloadRepos --no-daemon'
@@ -37,10 +26,7 @@ pipeline {
     }
 
     stage('test test') {
-      steps {
-        echo 'test test test'
-      }
+      steps { echo 'test test test' }
     }
   }
 }
-
